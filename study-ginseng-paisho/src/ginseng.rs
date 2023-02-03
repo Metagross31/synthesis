@@ -1,11 +1,10 @@
 use synthesis::prelude::*;
-const NUM_PLAYABLE_SQUARES: usize = 289;
 pub const NUM_MAX_TURNS: usize = 256;
 const MAX_NUM_POSSIBLE_MOVES: usize = 128; // TODO: Calculate this!
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Ginseng {
-    board: [i8; NUM_PLAYABLE_SQUARES],
+    board: [[Option<Piece>; 17]; 17],
     player: PlayerID,
 }
 
@@ -18,8 +17,22 @@ pub enum PlayerID {
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Move {
     player: PlayerID,
+    piece: Piece,
     from: i8,
     to: i8,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Piece {
+    Lotus { player: PlayerID },
+    Ginseng { player: PlayerID },
+    LionTurtle { player: PlayerID },
+    Dragon { player: PlayerID },
+    SkyBison { player: PlayerID },
+    BadgerMole { player: PlayerID },
+    Koi { player: PlayerID },
+    Orchid { player: PlayerID },
+    Wheel { player: PlayerID },
 }
 
 pub struct GinsengIterator;
@@ -61,6 +74,26 @@ impl HasTurnOrder for PlayerID {
     }
 }
 
+impl Ginseng {
+    #[inline]
+    pub fn winner(&self) -> Option<PlayerID> {
+        for (i, row) in self.board.iter().enumerate() {
+            for (j, square) in row.iter().enumerate() {
+                if let Some(piece) = square {
+                    if let Piece::Lotus { player } = piece {
+                        if j > 8 && player == &PlayerID::Host {
+                            return Some(PlayerID::Host);
+                        } else if j < 8 && player == &PlayerID::Guest {
+                            return Some(PlayerID::Guest);
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+}
+
 impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
     type PlayerId = PlayerID;
     type Action = Move;
@@ -72,34 +105,54 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
     const NUM_PLAYERS: usize = 2;
     const DIMS: &'static [i64] = &[];
 
+    #[inline]
     fn new() -> Self {
-        todo!()
+        Self {
+            board: [[None; 17]; 17],
+            player: PlayerID::Guest,
+        }
     }
 
+    #[inline]
     fn player(&self) -> Self::PlayerId {
-        todo!()
+        self.player
     }
 
+    #[inline]
     fn is_over(&self) -> bool {
-        todo!()
+        self.winner().is_some()
     }
 
+    #[inline]
     fn reward(&self, player_id: Self::PlayerId) -> f32 {
-        todo!()
+        match self.winner() {
+            None => 0.0,
+            Some(winner) => {
+                if winner == player_id {
+                    1.0
+                } else {
+                    -1.0
+                }
+            }
+        }
     }
 
+    #[inline]
     fn iter_actions(&self) -> Self::ActionIterator {
-        todo!()
+        GinsengIterator
     }
 
+    #[inline]
     fn step(&mut self, action: &Self::Action) -> bool {
         todo!()
     }
 
+    #[inline]
     fn features(&self) -> Self::Features {
         todo!()
     }
 
+    #[inline]
     fn print(&self) {
         todo!()
     }
