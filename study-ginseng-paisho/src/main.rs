@@ -8,6 +8,7 @@ use crate::ginseng::Ginseng;
 use crate::policies::*;
 use synthesis::prelude::*;
 
+// TODO: Learn what all these configs do and adapt them for Ginseng Pai Sho
 fn learn<G: 'static + Game<N>, P: Policy<G, N> + NNPolicy<G, N>, const N: usize>(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let cfg = LearningConfig {
