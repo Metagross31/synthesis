@@ -77,7 +77,7 @@ impl HasTurnOrder for PlayerID {
 impl Ginseng {
     #[inline]
     pub fn winner(&self) -> Option<PlayerID> {
-        for (i, row) in self.board.iter().enumerate() {
+        for row in self.board.iter() {
             for (j, square) in row.iter().enumerate() {
                 if let Some(piece) = square {
                     if let Piece::Lotus { player } = piece {
