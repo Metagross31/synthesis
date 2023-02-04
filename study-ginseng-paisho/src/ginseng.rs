@@ -4,8 +4,19 @@ use synthesis::prelude::*;
 
 mod utils;
 
+const _NUM_SQUARES: u8 = 249;
 pub const NUM_MAX_TURNS: usize = 256;
-const MAX_NUM_POSSIBLE_MOVES: usize = 128; // TODO: Calculate this!
+const MAX_NUM_POSSIBLE_MOVES: usize = 2034; // TODO: Find a lower upper bound, if possible
+/// Wheel: Max 8 per direction = 64
+/// All usual tiles: (5 + 9 + 7 + 5 + 3 + 1) * 2 = 60
+/// Tiles boosted by Dragon: (6 + 11 + 9 + 7 + 5 + 3 + 1) * 2 = 84
+/// Maximum 6 tiles boosted by Dragon, total of 7 tiles, means 8 * 84 + 60 = 732
+/// Tiles + Wheels = 796
+/// Lotus: Can at most land on 1 out of 4 tiles, excluding itself and the enemy lotus = 62 squares
+/// Tiles + Wheels + Lotus = 858
+/// BM and SB tiles have actions - up to 8 directions
+/// Tiles_new = 60 + 6 * 84 + 2 * 8 * 84 = 1908
+/// Tiles_new + Wheels + Lotus = 2034
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Ginseng {
