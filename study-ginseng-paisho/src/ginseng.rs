@@ -166,7 +166,7 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
                     Some(Piece::OutOfBounds) => row_string += " ",
                     Some(piece ) => {
                         let letter = match piece {
-                            Piece::Lotus { .. } => "\x1b[93mL\x1b[0m",
+                            Piece::Lotus { .. } => "L",
                             Piece::Ginseng { .. } => "G",
                             Piece::LionTurtle { .. } => "T",
                             Piece::Dragon { .. } => "D",
@@ -189,8 +189,8 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
                             Piece::Orchid { player }|
                             Piece::Wheel { player } => {
                                 match player {
-                                    PlayerID::Host => {row_string += &letter.red().bold()}
-                                    PlayerID::Guest => {row_string += &letter.green().bold()} // TODO: Fix the coloring!
+                                    PlayerID::Host => {row_string += &letter.black().on_truecolor(189, 148, 102).bold().to_string()}
+                                    PlayerID::Guest => {row_string += &letter.on_truecolor(117, 112, 37).bold().to_string()}
                                 }
                             }
                         }
