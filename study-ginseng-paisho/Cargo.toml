@@ -14,3 +14,4 @@ slimnn = { path = "../slimnn" }
 tch = "0.4.1"
 rand = "0.8.3"
 rand_distr = "0.4.0"
+colored = "2.0"

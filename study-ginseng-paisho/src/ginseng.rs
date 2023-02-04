@@ -1,3 +1,5 @@
+use colored::Colorize;
+use std::fmt::{Display, Formatter};
 use synthesis::prelude::*;
 
 mod utils;
@@ -51,14 +53,14 @@ impl Iterator for GinsengIterator {
 
 impl From<usize> for Move {
     #[inline]
-    fn from(value: usize) -> Self {
+    fn from(_value: usize) -> Self {
         todo!()
     }
 }
 
 impl From<Move> for usize {
     #[inline]
-    fn from(value: Move) -> Self {
+    fn from(_value: Move) -> Self {
         todo!()
     }
 }
@@ -145,7 +147,7 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
     }
 
     #[inline]
-    fn step(&mut self, action: &Self::Action) -> bool {
+    fn step(&mut self, _action: &Self::Action) -> bool {
         todo!()
     }
 
@@ -156,6 +158,64 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
 
     #[inline]
     fn print(&self) {
-        todo!()
+        for row in self.board {
+            let mut row_string = String::new();
+            for square in row {
+                match square {
+                    None => row_string += &"+",
+                    Some(Piece::OutOfBounds) => row_string += " ",
+                    Some(piece ) => {
+                        let letter = match piece {
+                            Piece::Lotus { .. } => "\x1b[93mL\x1b[0m",
+                            Piece::Ginseng { .. } => "G",
+                            Piece::LionTurtle { .. } => "T",
+                            Piece::Dragon { .. } => "D",
+                            Piece::SkyBison { .. } => "S",
+                            Piece::BadgerMole { .. } => "B",
+                            Piece::Koi { .. } => "K",
+                            Piece::Orchid { .. } => "O",
+                            Piece::Wheel { .. } => "W",
+                            _ => {" "}
+                        };
+                        match piece {
+                            Piece::OutOfBounds => {}
+                            Piece::Lotus { player } |
+                            Piece::Ginseng { player }|
+                            Piece::LionTurtle { player }|
+                            Piece::Dragon { player } |
+                            Piece::SkyBison { player }|
+                            Piece::BadgerMole { player }|
+                            Piece::Koi { player } |
+                            Piece::Orchid { player }|
+                            Piece::Wheel { player } => {
+                                match player {
+                                    PlayerID::Host => {row_string += &letter.red().bold()}
+                                    PlayerID::Guest => {row_string += &letter.green().bold()} // TODO: Fix the coloring!
+                                }
+                            }
+                        }
+                    }
+                }
+                row_string += " ";
+            }
+            println!("{row_string}");
+        }
+    }
+}
+
+impl Display for PlayerID {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                PlayerID::Host => {
+                    "H"
+                }
+                PlayerID::Guest => {
+                    "G"
+                }
+            }
+        )
     }
 }
