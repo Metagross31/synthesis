@@ -1,4 +1,7 @@
 use synthesis::prelude::*;
+
+mod utils;
+
 pub const NUM_MAX_TURNS: usize = 256;
 const MAX_NUM_POSSIBLE_MOVES: usize = 128; // TODO: Calculate this!
 
@@ -33,6 +36,7 @@ pub enum Piece {
     Koi { player: PlayerID },
     Orchid { player: PlayerID },
     Wheel { player: PlayerID },
+    OutOfBounds,
 }
 
 pub struct GinsengIterator;
@@ -79,13 +83,11 @@ impl Ginseng {
     pub fn winner(&self) -> Option<PlayerID> {
         for row in self.board.iter() {
             for (j, square) in row.iter().enumerate() {
-                if let Some(piece) = square {
-                    if let Piece::Lotus { player } = piece {
-                        if j > 8 && player == &PlayerID::Host {
-                            return Some(PlayerID::Host);
-                        } else if j < 8 && player == &PlayerID::Guest {
-                            return Some(PlayerID::Guest);
-                        }
+                if let Some(Piece::Lotus { player }) = square {
+                    if j > 8 && player == &PlayerID::Host {
+                        return Some(PlayerID::Host);
+                    } else if j < 8 && player == &PlayerID::Guest {
+                        return Some(PlayerID::Guest);
                     }
                 }
             }
@@ -108,7 +110,7 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
     #[inline]
     fn new() -> Self {
         Self {
-            board: [[None; 17]; 17],
+            board: utils::STARTING_BOARD,
             player: PlayerID::Guest,
         }
     }
