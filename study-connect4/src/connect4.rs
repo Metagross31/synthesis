@@ -171,13 +171,17 @@ impl Connect4 {
 }
 
 impl Game<WIDTH> for Connect4 {
-    const NAME: &'static str = "Connect4";
-    const NUM_PLAYERS: usize = 2;
-    const MAX_TURNS: usize = 63;
-
     type PlayerId = PlayerId;
     type Action = Column;
     type ActionIterator = FreeColumns;
+
+    type Features = [[[f32; WIDTH]; HEIGHT]; 1];
+    const MAX_TURNS: usize = 63;
+    const NAME: &'static str = "Connect4";
+
+    const NUM_PLAYERS: usize = 2;
+
+    const DIMS: &'static [i64] = &[1, 1, HEIGHT as i64, WIDTH as i64];
 
     fn new() -> Self {
         Self {
@@ -217,7 +221,6 @@ impl Game<WIDTH> for Connect4 {
             col: 0,
         }
     }
-
     fn step(&mut self, action: &Self::Action) -> bool {
         let col: usize = (*action).into();
 
@@ -231,9 +234,6 @@ impl Game<WIDTH> for Connect4 {
 
         self.is_over()
     }
-
-    const DIMS: &'static [i64] = &[1, 1, HEIGHT as i64, WIDTH as i64];
-    type Features = [[[f32; WIDTH]; HEIGHT]; 1];
     fn features(&self) -> Self::Features {
         let mut s = Self::Features::default();
         for row in 0..HEIGHT {
