@@ -90,15 +90,127 @@ impl Iterator for GinsengIterator {
 
 impl From<usize> for Move {
     #[inline]
-    fn from(_value: usize) -> Self {
-        todo!()
+    fn from(value: usize) -> Self {
+        let player_idx = value % 2;
+        let value = value / 2;
+        let piece_idx = value % 9;
+        let value = value / 9;
+        let from_idx = value % 256;
+        let value = value / 256;
+        let to_idx = value % 256;
+        let value = value / 256;
+        let effect_idx = value % 9;
+        let value = value / 9;
+        let exchange_idx = value % 9;
+
+        let player = match player_idx {
+            0 => PlayerID::Host,
+            1 => PlayerID::Guest,
+            _ => panic!(),
+        };
+        let piece = match piece_idx {
+            0 => Piece::Lotus { player },
+            1 => Piece::Ginseng { player },
+            2 => Piece::LionTurtle { player },
+            3 => Piece::Dragon { player },
+            4 => Piece::SkyBison { player },
+            5 => Piece::BadgerMole { player },
+            6 => Piece::Koi { player },
+            7 => Piece::Orchid { player },
+            8 => Piece::Wheel { player },
+            _ => panic!(),
+        };
+        let from = (from_idx + i8::MIN as usize) as i8;
+        let to = (to_idx + i8::MIN as usize) as i8;
+        let effect = match effect_idx {
+            0 => None,
+            1 => Some(Direction::North),
+            2 => Some(Direction::NorthEast),
+            3 => Some(Direction::East),
+            4 => Some(Direction::SouthEast),
+            5 => Some(Direction::South),
+            6 => Some(Direction::SouthWest),
+            7 => Some(Direction::West),
+            8 => Some(Direction::NorthWest),
+            _ => panic!(),
+        };
+        let exchange_into = match exchange_idx {
+            0 => None,
+            1 => Some(MortalPiece::Ginseng { player }),
+            2 => Some(MortalPiece::LionTurtle { player }),
+            3 => Some(MortalPiece::Dragon { player }),
+            4 => Some(MortalPiece::SkyBison { player }),
+            5 => Some(MortalPiece::BadgerMole { player }),
+            6 => Some(MortalPiece::Koi { player }),
+            7 => Some(MortalPiece::Orchid { player }),
+            8 => Some(MortalPiece::Wheel { player }),
+            _ => panic!(),
+        };
+
+        Self {
+            player,
+            piece,
+            from,
+            to,
+            effect,
+            exchange_into,
+        }
     }
 }
 
 impl From<Move> for usize {
     #[inline]
-    fn from(_value: Move) -> Self {
-        todo!()
+    fn from(value: Move) -> Self {
+        let player_idx = match value.player {
+            PlayerID::Host => 0,
+            PlayerID::Guest => 1,
+        };
+
+        let piece_idx = match value.piece {
+            Piece::Lotus { .. } => 0,
+            Piece::Ginseng { .. } => 1,
+            Piece::LionTurtle { .. } => 2,
+            Piece::Dragon { .. } => 3,
+            Piece::SkyBison { .. } => 4,
+            Piece::BadgerMole { .. } => 5,
+            Piece::Koi { .. } => 6,
+            Piece::Orchid { .. } => 7,
+            Piece::Wheel { .. } => 8,
+            Piece::OutOfBounds => panic!("OutOfBounds tiles cannot move!"),
+        };
+
+        let from_idx = (value.from as isize - i8::MIN as isize) as usize;
+        let to_idx = (value.to as isize - i8::MIN as isize) as usize;
+        let effect_idx = match value.effect {
+            None => 0,
+            Some(e) => match e {
+                Direction::North => 1,
+                Direction::NorthEast => 2,
+                Direction::East => 3,
+                Direction::SouthEast => 4,
+                Direction::South => 5,
+                Direction::SouthWest => 6,
+                Direction::West => 7,
+                Direction::NorthWest => 8,
+            },
+        };
+        let exchange_idx = match value.exchange_into {
+            None => 0,
+            Some(ex) => match ex {
+                MortalPiece::Ginseng { .. } => 1,
+                MortalPiece::LionTurtle { .. } => 2,
+                MortalPiece::Dragon { .. } => 3,
+                MortalPiece::SkyBison { .. } => 4,
+                MortalPiece::BadgerMole { .. } => 5,
+                MortalPiece::Koi { .. } => 6,
+                MortalPiece::Orchid { .. } => 7,
+                MortalPiece::Wheel { .. } => 8,
+            },
+        };
+
+        player_idx
+            + 2 * (piece_idx
+                + 9 * (from_idx + 256 * (to_idx + 256 * (effect_idx + 9 * (exchange_idx)))))
     }
 }
 
