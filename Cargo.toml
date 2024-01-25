@@ -8,3 +8,5 @@ members = [
     "study-connect4",
     "study-ginseng-paisho",
 ]
+
+resolver = "2"
