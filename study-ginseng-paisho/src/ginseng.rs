@@ -31,11 +31,25 @@ pub enum PlayerID {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum Direction {
+    North,
+    NorthEast,
+    East,
+    SouthEast,
+    South,
+    SouthWest,
+    West,
+    NorthWest,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct Move {
     player: PlayerID,
     piece: Piece,
     from: i8,
     to: i8,
+    effect: Option<Direction>,
+    exchange_into: Option<MortalPiece>,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -50,6 +64,18 @@ pub enum Piece {
     Orchid { player: PlayerID },
     Wheel { player: PlayerID },
     OutOfBounds,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum MortalPiece {
+    Ginseng { player: PlayerID },
+    LionTurtle { player: PlayerID },
+    Dragon { player: PlayerID },
+    SkyBison { player: PlayerID },
+    BadgerMole { player: PlayerID },
+    Koi { player: PlayerID },
+    Orchid { player: PlayerID },
+    Wheel { player: PlayerID },
 }
 
 pub struct GinsengIterator;
@@ -175,7 +201,7 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
                 match square {
                     None => row_string += &"+",
                     Some(Piece::OutOfBounds) => row_string += " ",
-                    Some(piece ) => {
+                    Some(piece) => {
                         let letter = match piece {
                             Piece::Lotus { .. } => "L",
                             Piece::Ginseng { .. } => "G",
@@ -186,24 +212,31 @@ impl Game<MAX_NUM_POSSIBLE_MOVES> for Ginseng {
                             Piece::Koi { .. } => "K",
                             Piece::Orchid { .. } => "O",
                             Piece::Wheel { .. } => "W",
-                            _ => {" "}
+                            _ => " ",
                         };
                         match piece {
                             Piece::OutOfBounds => {}
-                            Piece::Lotus { player } |
-                            Piece::Ginseng { player }|
-                            Piece::LionTurtle { player }|
-                            Piece::Dragon { player } |
-                            Piece::SkyBison { player }|
-                            Piece::BadgerMole { player }|
-                            Piece::Koi { player } |
-                            Piece::Orchid { player }|
-                            Piece::Wheel { player } => {
-                                match player {
-                                    PlayerID::Host => {row_string += &letter.black().on_truecolor(189, 148, 102).bold().to_string()}
-                                    PlayerID::Guest => {row_string += &letter.on_truecolor(117, 112, 37).bold().to_string()}
+                            Piece::Lotus { player }
+                            | Piece::Ginseng { player }
+                            | Piece::LionTurtle { player }
+                            | Piece::Dragon { player }
+                            | Piece::SkyBison { player }
+                            | Piece::BadgerMole { player }
+                            | Piece::Koi { player }
+                            | Piece::Orchid { player }
+                            | Piece::Wheel { player } => match player {
+                                PlayerID::Host => {
+                                    row_string += &letter
+                                        .black()
+                                        .on_truecolor(189, 148, 102)
+                                        .bold()
+                                        .to_string()
                                 }
-                            }
+                                PlayerID::Guest => {
+                                    row_string +=
+                                        &letter.on_truecolor(117, 112, 37).bold().to_string()
+                                }
+                            },
                         }
                     }
                 }
